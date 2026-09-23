@@ -5,15 +5,6 @@ spring:
       password: 123456
       name: alice
   ai:
-    # Define AI provider(s) for type of models for autoconfiguration
-    model:
-      chat: none
-      embedding: none
-      image: none
-      audio:
-        speech: none
-        transcription: none
-      moderation: none
     tools.observations.include-content: true
     mcp.server:
       name: ${spring.application.name}

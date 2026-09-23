@@ -1,9 +1,5 @@
 spring:
   ai:
-    # Define AI provider(s) for type of models for autoconfiguration
-    model:
-      chat: openai
-      embedding: openai
     # AI provider configuration
     openai:
       api-key: ${OPENAI_API_KEY}
