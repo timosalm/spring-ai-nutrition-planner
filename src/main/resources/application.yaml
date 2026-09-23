@@ -23,10 +23,14 @@ spring:
       enabled: true
       tool-index-type: lucene
       lucene.min-score-threshold: 0.4
+  docker.compose.enabled: false
 
 management:
   endpoints.web.exposure.include: "*"
-  otlp.metrics.export.enabled: false
+  otlp:
+    metrics.export.enabled: false
+    tracing.export.enabled: false
+    logging.export.enabled: false
 
 logging.level:
   org.springaicommunity: debug

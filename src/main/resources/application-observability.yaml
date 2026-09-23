@@ -1,7 +1,15 @@
 management:
-  tracing:
-    sampling.probability: 1.0
+    otlp:
+      metrics.export.enabled: true
+      metrics.export.step: 5s
+      tracing.export.enabled: true
+    metrics.tags.application: ${spring.application.name}
+    tracing.sampling.probability: 1.0
+
+spring:
+  ai:
+    chat.observations.include-error-logging: true
+    tools.observations.include-content: true
+  docker.compose:
     enabled: true
-  otlp:
-    metrics.export.step: 5s
-    tracing.endpoint: http://localhost:4318/v1/traces
+    profiles.active: observability

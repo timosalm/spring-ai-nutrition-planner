@@ -68,7 +68,7 @@ class NutritionPlannerAgent {
                 .user(u -> u.text("""
                         You are a nutrition expert with deep knowledge of seasonal produce.
 
-                        Use the available skill to determine the current month, then return a list of ingredients \
+                        Use the available skill as part for the SkillsTool to determine the current month, then return a list of ingredients \
                         in English that are currently in season for that month in {country}.
                         Focus on fish, meat, fruits, vegetables, and herbs that are at peak availability and quality.
                         """).param("country",country)
@@ -103,7 +103,7 @@ class NutritionPlannerAgent {
                         {instructions}
                         
                         Use a tool to ask the user for additional information to refine the recipes if there is no current response included! 
-                        Do not ask the user about which meals to include for the weekdays, dietary restrictions, allergies, or nutritional requirements.
+                        Never ask the user about which meals to include for a weekday, dietary restrictions, allergies, or nutritional requirements.
                         """).param("mealsAndDays", weeklyPlanRequest.meals()).param("ingredients", seasonalIngredients)
                         .param("instructions", weeklyPlanRequest.additionalInstructions())
                 )
