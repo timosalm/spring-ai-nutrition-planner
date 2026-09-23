@@ -18,6 +18,11 @@ spring:
     mcp.server:
       name: ${spring.application.name}
       protocol: STREAMABLE
+    # Enables the Tool Search Tool pattern, see https://www.anthropic.com/engineering/advanced-tool-use
+    chat.client.tool-search-advisor:
+      enabled: true
+      tool-index-type: lucene
+      lucene.min-score-threshold: 0.4
 
 management:
   endpoints.web.exposure.include: "*"
