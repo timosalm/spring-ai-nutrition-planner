@@ -2,7 +2,7 @@
 
 A sample project demonstrating how to build AI agents with Spring AI.
 
-**This is a copy of the Spring AI implementation from [SandraAhlgrimm/ai-nutrition-planner](https://github.com/SandraAhlgrimm/ai-nutrition-planner)**, a repository I created together with [Sandra Ahlgrimm](https://github.com/SandraAhlgrimm) for our talk comparing agentic Java frameworks. That repository implements the exact same nutrition planning use case three times — with Embabel, LangChain4j, and Spring AI — so the frameworks can be compared side by side. This repository extracts the Spring AI variant on its own; head over to the original if you want the comparison.
+**This is a copy of the Spring AI implementation from [SandraAhlgrimm/ai-nutrition-planner](https://github.com/SandraAhlgrimm/ai-nutrition-planner)**, a repository I created together with [Sandra Ahlgrimm](https://github.com/SandraAhlgrimm) for our talk comparing agentic Java frameworks. That repository implements the exact same nutrition planning use case three times — with Embabel, LangChain4j, and Spring AI — so the frameworks can be compared side by side. This repository extracts the Spring AI variant on its own.
 
 [Slides: Building AI Agents with Spring AI](slides.pdf)
 
@@ -25,7 +25,6 @@ The agent creates a personalized weekly meal plan:
 | **Tool Search** — dynamic tool discovery at runtime | `ToolSearchToolCallAdvisor` — separate search step discovers tools via metadata before each call |
 | **Human-in-the-Loop** — pause workflow for user input | `AskUserQuestionTool` |
 | **Agent Skills** — invoke pre-packaged executable skills | `SkillsTool` |
-| **Multi-Agent Orchestration** — specialized sub-agents collaborate | custom orchestration in code — no direct framework support |
 | **Persona** — role-based system prompts per agent | custom implementation via `.system()` on `ChatClient` |
 | **MCP Server** — expose agent as a Model Context Protocol tool | `@McpTool` |
 
@@ -33,19 +32,11 @@ The agent creates a personalized weekly meal plan:
 
 - **Java 25**
 - **Maven** (Maven wrapper included)
-- **Docker Desktop** (for Grafana observability stack and Ollama)
-- An LLM provider: **Azure OpenAI**, **OpenAI**, or **Ollama** (local)
+- **Docker Desktop** (for Grafana observability stack)
+- An LLM provider: **Azure OpenAI**, or **OpenAI**
 
 ## Setup
 ### LLM Providers
-
-**Ollama** (local, no API key required):
-
-```bash
-docker compose --profile ollama up -d
-```
-
-This starts Ollama and automatically pulls `qwen2.5`. 
 
 **Azure OpenAI**:
 
@@ -63,47 +54,26 @@ export OPENAI_API_KEY=sk-...
 
 ## Run
 
-Change into the implementation directory, set the Spring profile related to an LLM provider and start the app:
+Set the Spring profile related to an LLM provider and start the app:
 
 ```bash
-cd langchain4j   # or embabel, spring-ai
-export SPRING_PROFILES_ACTIVE=ollama # or openai, azure
+export SPRING_PROFILES_ACTIVE=openai # or azure
 ./mvnw spring-boot:run
 ```
 
-The app starts on port `8080`. Basic auth: `alice` / `123456`. UI at [http://localhost:8080](http://localhost:8080), REST API at `http://localhost:8080/api/nutrition-plan`.
+The app starts on port `8080`. Basic auth: `alice` / `123456`. UI at [http://localhost:8080](http://localhost:8080).
 
 ## Observability
 
-A Grafana + OTLP stack (Loki, Tempo, Mimir) is included via Docker Compose:
-```bash
-docker compose --profile observability up -d
-```
+A Grafana + OTLP stack (Loki, Tempo, Mimir) is included via Docker Compose.
 
 - **Grafana**: [http://localhost:3000](http://localhost:3000) (admin/admin)
 - **OTLP collector**: `localhost:4318` (HTTP) / `localhost:4317` (gRPC)
 
-To enable tracing and metrics export from any module, activate the `observability` profile 
+To start the docker compose container via Spring Boot and enable tracing and metrics export from any module, activate the `observability` profile 
 in addition to the profile for the LLM provider of choice:
 
 ```bash
-SPRING_PROFILES_ACTIVE=ollama,observability mvn spring-boot:run
+SPRING_PROFILES_ACTIVE=openai,observability ./mvnw spring-boot:run
 ```
 The dashboard shows agent invocation rates, execution durations (p95), active agents, HTTP endpoint latency, JVM metrics, and distributed traces.
-
-## Example Request
-
-```bash
-curl -s -X POST http://localhost:8080/api/nutrition-plan \
-  -u alice:123456 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "days": [
-      { "day": "MONDAY",    "meals": ["BREAKFAST", "LUNCH", "DINNER"] },
-      { "day": "TUESDAY",   "meals": ["BREAKFAST", "LUNCH", "DINNER"] },
-      { "day": "WEDNESDAY", "meals": ["LUNCH", "DINNER"] }
-    ],
-    "countryCode": "DE",
-    "additionalInstructions": "Prefer quick recipes with less than 30 minutes prep time."
-  }' | jq .
-```
